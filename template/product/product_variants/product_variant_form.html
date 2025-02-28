@@ -1,0 +1,162 @@
+{% extends 'profile/base.html' %}
+{% block title %}Product Variant {% if product_variant %}Update{% else %}Create{% endif %}{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+  .messages {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  .messages li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  .messages .success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
+  .messages .error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+  .invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 80%;
+    margin-top: 0.25rem;
+  }
+  .was-validated .form-control:invalid ~ .invalid-feedback {
+    display: block;
+  }
+</style>
+{% endblock css %}
+
+{% block body %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Product Variant {% if product_variant %}Update{% else %}Create{% endif %} Form</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'product_variant_list' %}">Product Variants</a></li>
+            <li class="breadcrumb-item active">{% if product_variant %}Update{% else %}Create{% endif %} Form</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Product Variant Form</h3>
+            </div>
+
+            {% if messages %}
+            <div class="card-body">
+              <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            <form method="POST" id="productVariantForm" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <div class="card-body">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label for="product">Product: <span class="text-danger">*</span></label>
+                    <select class="form-control" id="product" name="product" required>
+                      <option value="">Select a product</option>
+                      {% for product in products %}
+                      <option value="{{ product.id }}" 
+                        {% if product_variant and product_variant.product.id == product.id %}selected{% endif %}>
+                        {{ product.product_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">
+                      Please select a product.
+                    </div>
+                  </div>
+                  
+                  <div class="form-group col-md-6">
+                    <label for="size">Size: <span class="text-danger">*</span></label>
+                    <select class="form-control" id="size" name="size" required>
+                      <option value="">Select a size</option>
+                      {% for size in sizes %}
+                      <option value="{{ size.id }}"
+                        {% if product_variant and product_variant.size.id == size.id %}selected{% endif %}>
+                        {{ size.size_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">
+                      Please select a product.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label for="price">Price: <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="price" name="price" 
+                           value="{{ product_variant.price|default:0 }}" required min="0">
+                    <div class="invalid-feedback">
+                      Please provide a valid price.
+                    </div>
+                  </div>
+                  
+                  <div class="form-group col-md-6">
+                    <label for="stock">Stock: <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="stock" name="stock" 
+                           value="{{ product_variant.stock|default:0 }}" required min="0">
+                    <div class="invalid-feedback">
+                      Please provide a valid stock amount.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                  {% if product_variant %}Update{% else %}Create{% endif %} Variant
+                </button>
+                <a href="{% url 'product_variant_list' %}" class="btn btn-secondary">Cancel</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('productVariantForm');
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  });
+});
+</script>
+{% endblock custom_js %}

@@ -1,0 +1,109 @@
+{% extends 'profile/base.html' %}
+{% block title %}FAQs{% endblock %}
+
+{% block css %}
+<style>
+  .messages { list-style-type: none; padding: 0; margin-bottom: 20px; }
+  .messages li { padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+  .messages .success { background-color: #d4edda; color: #155724; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>FAQs</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item active">FAQs</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">FAQ List</h3>
+          <div class="float-right">
+            <a href="{% url 'faq_create' %}" class="btn btn-primary">Add New FAQ</a>
+          </div>
+        </div>
+        <div class="card-body">
+          {% for category in categories %}
+          <div class="card card-outline card-info mb-4">
+            <div class="card-header">
+              <h3 class="card-title">{{ category.category_name }}</h3>
+            </div>
+            <div class="card-body">
+              
+              {% with category.faq_items.all|first as first_faq_with_image %}
+                {% if first_faq_with_image and first_faq_with_image.image %}
+                  <div class="mb-3">
+                    <img src="{{ first_faq_with_image.image.url }}" alt="Category Image" width="100">
+                  </div>
+                {% endif %}
+              {% endwith %}
+              
+              <table class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>Question</th>
+                    <th>Answer</th>
+                    <th width="120">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for faq in category.faq_items.all %}
+                  <tr>
+                    <td>{{ faq.question }}</td>
+                    <td>{{ faq.answer }}</td>
+                    <td>
+                      <a href="{% url 'faq_update' faq.id %}" class="btn btn-info btn-sm">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'faq_delete' faq.id %}" class="btn btn-danger btn-sm" 
+                         onclick="return confirm('Are you sure?')">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endfor %}
+        
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+$(function () {
+  $('.table').DataTable({
+    "responsive": true,
+    "lengthChange": false,
+    "autoWidth": false
+  });
+});
+</script>
+{% endblock %}

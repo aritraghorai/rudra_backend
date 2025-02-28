@@ -1,0 +1,227 @@
+{% extends 'profile/base.html' %}
+{% block title %}Product Design {% if product_designs %}Update{% else %}Create{% endif %}{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+  .messages {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  .messages li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  .messages .success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
+  .messages .error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+  .invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 80%;
+    margin-top: 0.25rem;
+  }
+  .was-validated .form-control:invalid ~ .invalid-feedback {
+    display: block;
+  }
+  .image-preview {
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 10px;
+    display: none;
+  }
+  .file-input-wrapper {
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock css %}
+
+{% block body %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Product Design {% if product_designs %}Update{% else %}Create{% endif %} Form</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'product_designs_list' %}">Product Designs</a></li>
+            <li class="breadcrumb-item active">{% if product_designs %}Update{% else %}Create{% endif %} Form</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Product Design Form</h3>
+            </div>
+
+            {% if messages %}
+            <div class="card-body">
+              <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" id="productDesignForm" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <div class="card-body">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label for="design_name">Design Name: <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="design_name" name="design_name" 
+                           value="{{ product_designs.design_name|default:'' }}" required>
+                    <div class="invalid-feedback">
+                      Please provide a design name.
+                    </div>
+                  </div>
+                  
+                  <div class="form-group col-md-6">
+                    <label for="design_icon">Design Icon:</label>
+                    <div class="file-input-wrapper">
+                      <div class="input-group">
+                        <div class="custom-file">
+                          <input type="file" class="custom-file-input" id="design_icon" name="design_icon"
+                                 accept="image/*" onchange="previewImage(this, 'iconPreview')">
+                          <label class="custom-file-label" for="design_icon">Choose file</label>
+                        </div>
+                      </div>
+                      {% if product_designs.design_icon %}
+                      <img src="{{ product_designs.design_icon.url }}" class="image-preview" id="iconPreview" style="display: block;">
+                      {% else %}
+                      <img src="" class="image-preview" id="iconPreview">
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="form-group">
+                  <label for="design_price">Design Price: <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control" id="design_price" name="design_price" 
+                         value="{{ product_designs.design_price|default:0 }}" required min="0">
+                  <div class="invalid-feedback">
+                    Please provide a valid price.
+                  </div>
+                </div>
+            
+                <div class="form-group">
+                  <label for="design_image">Design Images:</label>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="file-input-wrapper">
+                        <input type="file" class="form-control" id="design_image" name="design_image" 
+                               accept="image/*" onchange="previewImage(this, 'imagesPreview')">
+                        {% if product_designs.design_image %}
+                        <img src="{{ product_designs.design_image.url }}" class="image-preview" id="imagesPreview" style="display: block;">
+                        {% else %}
+                        <img src="" class="image-preview" id="imagesPreview">
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="form-group">
+                  <label for="design_description">Description:</label>
+                  <textarea id="design_description" class="form-control summernote" 
+                            name="design_description">{{ product_designs.design_description|default:'' }}</textarea>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                  {% if product_designs %}Update{% else %}Create{% endif %} Design
+                </button>
+                <a href="{% url 'product_designs_list' %}" class="btn btn-secondary">Cancel</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Summernote
+  $('.summernote').summernote({
+    height: 200,
+    toolbar: [
+      ['style', ['style']],
+      ['font', ['bold', 'italic', 'underline', 'clear']],
+      ['para', ['ul', 'ol']],
+      ['insert', ['link']],
+      ['view', ['fullscreen', 'codeview']]
+    ]
+  });
+
+  // Form validation
+  const form = document.getElementById('productDesignForm');
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  });
+
+  // File input label update
+  $('.custom-file-input').on('change', function() {
+    let fileName = $(this).val().split('\\').pop();
+    $(this).next('.custom-file-label').html(fileName || 'Choose file');
+  });
+});
+
+// Image preview function
+function previewImage(input, previewId) {
+  const preview = document.getElementById(previewId);
+  const file = input.files[0];
+  
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    }
+    reader.readAsDataURL(file);
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+}
+
+// File type validation
+function validateFileType(input) {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  const file = input.files[0];
+  
+  if (file && !allowedTypes.includes(file.type)) {
+    alert('Please upload an image file (JPEG, PNG, or GIF)');
+    input.value = '';
+    return false;
+  }
+  return true;
+}
+</script>
+{% endblock custom_js %}

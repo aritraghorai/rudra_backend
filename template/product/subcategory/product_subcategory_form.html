@@ -1,0 +1,124 @@
+{% extends 'profile/base.html' %}
+{% block title %}Product subcategory data create form{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+  /* You can add custom styles here if needed */
+  .messages {
+    list-style-type: none;
+    padding: 0;
+  }
+  .messages li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  .messages .success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
+  .messages .error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+</style>
+{% endblock css %}
+
+{% block body %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Product SubCategory Create Form</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active">Product Subcategory create Form</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+          <!-- general form elements -->
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Product SubCategory Create</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="card-body">
+                <!-- Messages section -->
+                {% if messages %}
+                <ul class="messages">
+                  {% for message in messages %}
+                  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                <!-- select -->
+                <div class="form-group">
+                  <label>Category</label>
+                  <select class="form-control" name="category_id">
+                    {% for data in product_categories %}
+                    <option value="{{data.id}}">{{data.category_name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="category_name">SubCategory Name:</label>
+                  <input type="text" class="form-control" id="subcategory_name" name="subcategory_name" value="{{product_subcategory.subcategory_name}}">
+                </div>
+                <div class="form-group">
+                  <label for="descriptions">Descriptions:</label>
+                  <textarea id="description" class="form-control" name="description" required>{{ product_subcategory.description }}</textarea>
+                </div>
+                <div class="form-group">
+                  <label for="image">Image:</label>
+                  <div class="input-group">
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" id="image" name="image">
+                      <label class="custom-file-label" for="image">Choose file</label>
+                    </div>
+                    <div class="input-group-append">
+                      <span class="input-group-text">Upload</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+            </form>
+          </div>
+          <!-- /.card -->
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+  $(function () {
+    // Summernote
+    $("#description").summernote();
+  });
+</script>
+{% endblock custom_js %}

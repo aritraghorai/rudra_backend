@@ -1,0 +1,176 @@
+{% extends 'profile/base.html' %}
+{% block title %}Consultation Bookings{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+.status-toggle {
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+}
+.status-complete {
+    background-color: #28a745;
+    color: white;
+}
+.status-pending {
+    background-color:rgb(185, 68, 0);
+    color: white;
+}
+</style>
+{% endblock css%}
+
+{% block body %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Consultation Bookings</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Consultation Bookings</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Consultation Bookings List</h3>
+                        </div>
+                        <div class="card-body">
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone Number</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if booking_list %}
+                                    {% for booking in booking_list %}
+                                    <tr>
+                                        <td>{{booking.first_name}} {{booking.last_name}}</td>
+                                        <td>{{booking.email}}</td>
+                                        <td>{{booking.phone_number}}</td>
+                                        <td>
+                                            <span id="status-text-{{booking.id}}">
+                                                {% if booking.completed %}Completed{% else %}Pending{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button 
+                                                class="status-toggle {% if booking.completed %}status-complete{% else %}status-pending{% endif %}"
+                                                onclick="toggleStatus('{{booking.id}}')"
+                                                id="toggle-btn-{{booking.id}}"
+                                            >
+                                                {% if booking.completed %}
+                                                Mark as Pending
+                                                {% else %}
+                                                Mark as Complete
+                                                {% endif %}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone Number</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+$(function () {
+    $("#example1").DataTable({
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "buttons": ["copy", "csv", "excel", "pdf", "print"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+});
+
+function toggleStatus(bookingId) {
+    fetch(`/admins/toggle-status/${bookingId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            // If the HTTP status code is not in the 200-299 range
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        
+        if (data.success) {
+            const button = document.getElementById(`toggle-btn-${bookingId}`);
+            const statusText = document.getElementById(`status-text-${bookingId}`);
+            if (!button || !statusText) {
+                throw new Error('Could not find button or status text elements');
+            }
+            if (data.completed) {
+                button.classList.remove('status-pending');
+                button.classList.add('status-complete');
+                button.textContent = 'Mark as Pending';
+                statusText.textContent = 'Completed';
+            } else {
+                button.classList.remove('status-complete');
+                button.classList.add('status-pending');
+                button.textContent = 'Mark as Complete';
+                statusText.textContent = 'Pending';
+            }
+        } else {
+            throw new Error(data.error || 'Operation failed');
+        }
+    })
+    .catch(error => {
+        alert('Failed to update status. Please try again later.');
+    });
+}
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock custom_js %}

@@ -1,0 +1,128 @@
+{% extends 'profile/base.html' %} {% block title %}Dashboard
+{%endblock%} {% load static %}
+{% block css %}
+<style> 
+</style>
+{% endblock css%}
+ {% block body %}
+<!-- Content Wrapper. Contains page content -->
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>DataTables</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">DataTables</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+  
+
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+              <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">DataTable with default features</h3>
+                  </div>
+                  <!-- /.card-header -->
+                  {%if consultations %}
+                  <div class="card-body">
+                    <table id="consultationDataTable" class="table table-bordered table-striped">
+                      <thead>
+                      <tr>
+                      <th>SL.no</th>
+                        <th>Title</th>
+                        <th>Image</th>
+                        <th>Video</th>
+                        <th>Descriptions</th>
+                        <th>Benefits Of Consultation</th>
+                        <th>Consult Info</th>
+                       
+                      </tr>
+                      </thead>
+                      <tbody>
+                        {% for con in consultations %}
+                          <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{con.title}}</td>
+                          
+                            <td>
+                            <img src="{{con.image }}" alt="" width="50" height="50" style="border-radius: 100%;">
+                            </td>
+                             
+                             <td>
+                              <a class="btn btn-app" data-target="#videoModal{{ forloop.counter }}" data-toggle="modal">
+                                <i class="fas fa-play" style="font-size: 10px !important;"></i> Play
+                              </a>
+                            
+                              <div class="modal fade" id="videoModal{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+                              <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="videoModalLabel">{{ con.video }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <video controls width="100%">
+                                            <source src="{{ con.video }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                </div>
+                              </div>
+                              </div>
+
+                             
+                            </td> 
+                            <td>{{con.descriptions}}</td>
+                            <td>{{con.benefits_of_consultation}}</td>
+                            <td>{{con.consult_info}}</td>
+                           
+                            
+                          </tr>
+                        {%endfor%}
+                      </tbody>
+                    </table>
+                  </div>
+                  {%else%}
+                  <div class="card-body">
+                      <h5>No Data </h5>
+                  </div>
+                  {%endif%}
+                  <!-- /.card-body -->
+                </div>
+          </div>
+        </div>
+      </div>
+  </section>
+
+  </div>
+{% endblock %}
+
+
+{% block custom_js %}
+<script>
+ 
+
+  $(function () {
+    $("#consultationDataTable").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,
+      "buttons": ["copy", "csv", "excel", "pdf", "print"]
+    }).buttons().container().appendTo('#consultationDataTable_wrapper .col-md-6:eq(0)');
+  
+  });
+</script>
+{% endblock custom_js %}

@@ -1,0 +1,136 @@
+{% extends 'profile/base.html' %}
+{% block title %}Product Image {% if product_image %}Update{% else %}Create{% endif %}{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+  .messages { list-style-type: none; padding: 0; margin-bottom: 20px; }
+  .messages li { padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+  .messages .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+  .messages .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+  .invalid-feedback { display: none; color: #dc3545; font-size: 80%; margin-top: 0.25rem; }
+  .was-validated .form-control:invalid ~ .invalid-feedback { display: block; }
+  .image-preview { max-width: 200px; max-height: 200px; margin-top: 10px; display: none; }
+</style>
+{% endblock css %}
+
+{% block body %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Product Image {% if product_image %}Update{% else %}Create{% endif %}</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'product_image_list' %}">Product Images</a></li>
+            <li class="breadcrumb-item active">{% if product_image %}Update{% else %}Create{% endif %}</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Product Image Form</h3>
+            </div>
+
+            {% if messages %}
+            <div class="card-body">
+              <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" id="productImageForm" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <div class="card-body">
+                <div class="form-group">
+                  <label for="product">Product: <span class="text-danger">*</span></label>
+                  <select class="form-control" id="product" name="product" required>
+                    <option value="">Select Product</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}" {% if product_image.product_id == product.id %}selected{% endif %}>
+                      {{ product.product_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                  <div class="invalid-feedback">Please select a product.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="image">Image: {% if not product_image %}<span class="text-danger">*</span>{% endif %}</label>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="image" name="image" 
+                           accept="image/*" onchange="previewImage(this)" {% if not product_image %}required{% endif %}>
+                    <label class="custom-file-label" for="image">Choose file</label>
+                  </div>
+                  <div class="invalid-feedback">Please select an image file.</div>
+                  {% if product_image.image %}
+                  <img src="{{ product_image.image.url }}" class="image-preview" id="imagePreview" style="display: block;">
+                  {% else %}
+                  <img src="" class="image-preview" id="imagePreview">
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                  {% if product_image %}Update{% else %}Create{% endif %} Image
+                </button>
+                <a href="{% url 'product_image_list' %}" class="btn btn-secondary">Cancel</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('productImageForm');
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  });
+
+  $('.custom-file-input').on('change', function() {
+    let fileName = $(this).val().split('\\').pop();
+    $(this).next('.custom-file-label').html(fileName || 'Choose file');
+  });
+});
+
+function previewImage(input) {
+  const preview = document.getElementById('imagePreview');
+  const file = input.files[0];
+  
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    }
+    reader.readAsDataURL(file);
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+}
+</script>
+{% endblock custom_js %}

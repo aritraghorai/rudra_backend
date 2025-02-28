@@ -1,0 +1,269 @@
+{% extends 'profile/base.html' %}
+{% block title %}Product {% if product %}Update{% else %}Create{% endif %}{% endblock %}
+{% load static %}
+
+{# Keep your existing CSS block #}
+{% block css %}
+<style>
+  .messages { list-style-type: none; padding: 0; margin-bottom: 20px; }
+  .messages li { padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+  .messages .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+  .messages .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+  .invalid-feedback { display: none; color: #dc3545; font-size: 80%; margin-top: 0.25rem; }
+  .was-validated .form-control:invalid ~ .invalid-feedback { display: block; }
+  .image-preview { max-width: 200px; max-height: 200px; margin-top: 10px; }
+  .image-preview-container { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .preview-image { width: 150px; height: 150px; object-fit: cover; margin: 5px; }
+  .design-checkbox {
+    display: inline-block;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    margin: 5px;
+    margin-right: 100px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .design-checkbox input[type="checkbox"] {
+    display: none;
+  }
+  
+  .design-checkbox img.design-icon {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    margin-bottom: 5px;
+  }
+  
+  .design-checkbox:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .design-checkbox input[type="checkbox"]:checked + img {
+    border: 2px solid #007bff;
+  }
+  
+</style>
+{% endblock css %}
+{% block body %}
+<div class="content-wrapper">
+
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Product {% if product %}Update{% else %}Create{% endif %}</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url 'product_list' %}">Products</a></li>
+              <li class="breadcrumb-item active">{% if product %}Update{% else %}Create{% endif %}</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Product Form</h3>
+            </div>
+
+            {% if messages %}
+            {# Keep your existing messages section #}
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" id="productForm" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <div class="card-body">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label for="product_name">Product Name: <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="product_name" name="product_name" 
+                           value="{{ product.product_name|default:'' }}" required>
+                    <div class="invalid-feedback">Please provide a product name.</div>
+                  </div>
+
+                  <div class="form-group col-md-6">
+                    <label for="product_category">Category: <span class="text-danger">*</span></label>
+                    <select class="form-control" id="product_category" name="product_category" required>
+                      <option value="">Select Category</option>
+                      {% for category in categories %}
+                      <option value="{{ category.id }}" {% if product.product_category_id == category.id %}selected{% endif %}>
+                        {{ category.category_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">Please select a category.</div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label for="product_subcategory">Subcategory:</label>
+                    <select class="form-control" id="product_subcategory" name="product_subcategory">
+                      <option value="">Select Subcategory</option>
+                      {% if product.product_subcategory %}
+                      <option value="{{ product.product_subcategory.id }}" selected>
+                        {{ product.product_subcategory.subcategory_name }}
+                      </option>
+                      {% endif %}
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="product_designs">Designs:</label>
+                    <div class="row">
+                      {% for design in designs %}
+                      <div class="col-md-3 text-center">
+                        <label class="design-checkbox">
+                          <input type="checkbox" name="product_designs" value="{{ design.id }}"
+                                 {% if design.id in selected_design_ids %}checked{% endif %}>
+                          <img src="{{ design.design_icon.url }}" alt="{{ design.design_name }}" class="design-icon">
+                          <p>{{ design.design_name }}</p>
+                        </label>
+                      </div>
+                    {% endfor %}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="beej_mantra">Beej Mantra:</label>
+                  <textarea class="form-control summernote" id="beej_mantra" name="beej_mantra">{{ product.beej_mantra|default:'' }}</textarea>
+                </div>
+                <div class="form-group">
+                  <label for="description">Description:</label>
+                  <textarea class="form-control summernote" id="description" name="description">{{ product.description|default:'' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="product_images">Product Images:</label>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="product_images" name="product_images" 
+                           multiple accept="image/*" onchange="previewImages(this)">
+                    <label class="custom-file-label" for="product_images">Choose files</label>
+                  </div>
+                  <div id="imagePreviewContainer" class="image-preview-container">
+                    {% if product %}
+                      {% for image in product.images.all %}
+                        <img src="{{ image.image.url }}" class="preview-image">
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                  {% if product %}Update{% else %}Create{% endif %} Product
+                </button>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary">Cancel</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    $(document).ready(function () {
+        // Initialize Summernote
+        $('.summernote').summernote({
+          height: 200,
+          toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['para', ['ul', 'ol']],
+            ['insert', ['link']],
+            ['view', ['fullscreen', 'codeview']]
+          ]
+        });
+      
+        // Form validation
+        const form = document.getElementById('productForm');
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        });
+      
+        // Category-Subcategory dynamic loading
+        $('#product_category').change(function () {
+          const categoryId = $(this).val();
+          if (categoryId) {
+            $.ajax({
+              url: '{% url "get_subcategories" %}', // Replace with dynamic URL if not in Django template
+              data: { 'category_id': categoryId },
+              headers: {
+                'X-CSRFToken': '{{ csrf_token }}' // Add CSRF token for Django compatibility
+              },
+              success: function (data) {
+                let options = '<option value="">Select Subcategory</option>';
+                data.forEach(function (item) {
+                  options += `<option value="${item.id}">${item.subcategory_name}</option>`;
+                });
+                $('#product_subcategory').html(options);
+              },
+              error: function () {
+                alert('Failed to load subcategories. Please try again.');
+              }
+            });
+          } else {
+            $('#product_subcategory').html('<option value="">Select Subcategory</option>');
+          }
+        });
+      
+        // Image preview function
+        function previewImages(input) {
+          const container = document.getElementById('imagePreviewContainer');
+          container.innerHTML = ''; // Clear previous previews
+      
+          if (input.files) {
+            Array.from(input.files).forEach(file => {
+              // Ensure only image files are processed
+              if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                  const img = document.createElement('img');
+                  img.src = e.target.result;
+                  img.className = 'preview-image';
+                  img.style.width = '100px'; // Added styling
+                  img.style.height = '100px';
+                  img.style.margin = '5px';
+                  container.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+              } else {
+                alert('Only image files are allowed.');
+              }
+            });
+          }
+        }
+      
+        // Update file input label dynamically
+        $('.custom-file-input').on('change', function () {
+          let fileCount = this.files.length;
+          let label = fileCount > 1 ? fileCount + ' files selected' : (fileCount === 1 ? this.files[0].name : 'Choose file');
+          $(this).next('.custom-file-label').html(label);
+        });
+      
+        // Attach the image preview function to the file input
+        $('#imageInput').on('change', function () {
+          previewImages(this);
+        });
+      });
+      
+</script>
+{% endblock custom_js %}

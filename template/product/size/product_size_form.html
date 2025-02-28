@@ -1,0 +1,118 @@
+{% extends 'profile/base.html' %}
+{% block title %}Product Size {% if product_size %}Update{% else %}Create{% endif %}{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+  .messages {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  .messages li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  .messages .success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
+  .messages .error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+  .invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 80%;
+    margin-top: 0.25rem;
+  }
+  .was-validated .form-control:invalid ~ .invalid-feedback {
+    display: block;
+  }
+</style>
+{% endblock css %}
+
+{% block body %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Product Size {% if product_size %}Update{% else %}Create{% endif %} Form</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'product_size_list' %}">Product Sizes</a></li>
+            <li class="breadcrumb-item active">{% if product_size %}Update{% else %}Create{% endif %} Form</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Product Size Form</h3>
+            </div>
+
+            {% if messages %}
+            <div class="card-body">
+              <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            <form method="POST" id="productSizeForm" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <div class="card-body">
+                <div class="row">
+                  <div class="form-group">
+                    <label for="size_name">Size Name: <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="size_name" name="size_name" 
+                           value="{{ product_size.size_name|default:'' }}" required>
+                    <div class="invalid-feedback">
+                        Please provide a size name.
+                    </div>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                  {% if product_size %}Update{% else %}Create{% endif %} Size
+                </button>
+                <a href="{% url 'product_size_list' %}" class="btn btn-secondary">Cancel</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('productSizeForm');
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  });
+});
+</script>
+{% endblock custom_js %}
