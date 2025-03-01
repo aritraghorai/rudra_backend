@@ -1,0 +1,767 @@
+{% extends 'profile/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+    /* Main Styles */
+    :root {
+        --primary-color: #4e73df;
+        --primary-dark: #3a57c2;
+        --secondary-color: #f8f9fc;
+        --success-color: #1cc88a;
+        --danger-color: #e74a3b;
+        --warning-color: #f6c23e;
+        --dark-color: #5a5c69;
+        --light-color: #f8f9fa;
+        --border-color: #e3e6f0;
+        --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15);
+        --transition: all 0.2s ease-in-out;
+    }
+
+    .content-wrapper {
+        background-color: var(--secondary-color);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    .content-header {
+        margin-bottom: 2rem;
+    }
+
+    .content-header h1 {
+        color: var(--dark-color);
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .breadcrumb-item {
+        font-size: 0.85rem;
+        color: var(--primary-color);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--dark-color);
+    }
+
+    /* Form Styling */
+    .form-container {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        color: var(--dark-color);
+        font-weight: 600;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-label {
+        color: var(--dark-color);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid var(--border-color);
+        border-radius: 0.35rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+
+    .form-control:focus {
+        border-color: #bac8f3;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .form-control-lg {
+        font-size: 1rem;
+    }
+
+    /* File Upload Styling */
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .file-upload-input {
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        height: calc(1.5em + 1.5rem + 2px);
+        margin: 0;
+        opacity: 0;
+    }
+
+    .file-upload-label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 0;
+        display: flex;
+        align-items: center;
+        height: calc(1.5em + 1.5rem + 2px);
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.35rem;
+        background-color: white;
+        color: #6e707e;
+        cursor: pointer;
+    }
+
+    .file-upload-label::after {
+        content: "Browse";
+        display: inline-block;
+        margin-left: auto;
+        padding: 0.4rem 0.85rem;
+        color: white;
+        background-color: var(--primary-color);
+        border-radius: 0.25rem;
+        font-size: 0.8rem;
+        transition: var(--transition);
+    }
+
+    .file-upload-label:hover::after {
+        background-color: var(--primary-dark);
+    }
+
+    /* Preview Styling */
+    .preview-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .preview-container img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 0.35rem;
+        border: 1px solid var(--border-color);
+        padding: 3px;
+        transition: var(--transition);
+    }
+
+    .preview-container img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    /* Current Image Preview */
+    .current-image-preview {
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .current-image-preview img {
+        max-width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 0.35rem;
+        border: 2px solid var(--border-color);
+        padding: 4px;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+    .current-image-preview img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    .current-image-preview .image-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px 8px;
+        font-size: 0.8rem;
+        border-bottom-left-radius: 0.35rem;
+        border-bottom-right-radius: 0.35rem;
+        text-align: center;
+    }
+
+    .current-image-preview .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .current-image-preview .remove-image:hover {
+        background-color: #bd2130;
+    }
+
+    /* Video Preview */
+    .video-preview {
+        margin-top: 15px;
+        border-radius: 0.35rem;
+        overflow: hidden;
+        border: 2px solid var(--border-color);
+    }
+
+    .video-preview-placeholder {
+        height: 200px;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--dark-color);
+        border-radius: 0.35rem;
+        border: 2px solid var(--border-color);
+    }
+
+    .video-preview-placeholder i {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    /* Card Styling */
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background-color: white;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    /* Button Styling */
+    .btn {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.9rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    /* Item Groups */
+    .item-group {
+        background-color: #f8f9fc;
+        border-radius: 0.35rem;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .item-group-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Section Dividers */
+    .section-divider {
+        width: 100%;
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 2rem 0;
+    }
+
+    /* Multi-image Gallery */
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+</style>
+{% endblock css %}
+
+{% block body %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <h1>Dashboard</h1>
+                    <p class="text-muted">Manage your website content</p>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Dashboard</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <form method="post" enctype="multipart/form-data" id="dashboardForm">
+            {% csrf_token %}
+
+            <!-- Main Banner Images -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-images mr-2"></i> Banner Images
+                </div>
+                <div class="card-body">
+                    <!-- Current Banner Images -->
+                    <h5 class="mb-3">Current Banner Images</h5>
+                    <div class="image-gallery">
+                        {% for image in page.images %}
+                        <div class="current-image-preview">
+                            <img src="{{ request.scheme }}://{{ request.get_host }}{{ image.path }}"
+                                alt="Banner Image {{ image.id }}">
+                            <div class="image-label">Image {{ image.id }}</div>
+                            <!-- <button type="button" class="remove-image" title="Remove Image">
+                                <i class="fas fa-times"></i>
+                            </button> -->
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Upload New Images -->
+                    <div class="form-group">
+                        <label for="images" class="form-label">Upload New Banner Images</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" class="file-upload-input" id="images" name="images" accept="image/*"
+                                multiple>
+                            <label class="file-upload-label" for="images">
+                                <span>Choose files...</span>
+                            </label>
+                        </div>
+                        <div id="previewContainer" class="preview-container mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-heading mr-2"></i> Hero Section
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heading1" class="form-label">Main Heading</label>
+                                <input class="form-control" value="{{ page.heading1 }}" type="text"
+                                    placeholder="Enter main heading" id="heading1" name="heading1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="description1" class="form-label">Description</label>
+                                <input class="form-control" type="text" value="{{ page.description1 }}"
+                                    placeholder="Enter your main description" id="description1" name="description1"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="video_link1" class="form-label">Video Link</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fab fa-youtube"></i></span>
+                            </div>
+                            <input class="form-control" type="url" value="{{ page.video_link1 }}"
+                                placeholder="https://www.youtube.com/" id="video_link1" name="video_link1" required>
+                        </div>
+
+                        <!-- Video Preview -->
+                        <div class="video-preview mt-3">
+                            <iframe width="100%" height="250" src="https://www.youtube.com/embed/_drMO01Mjtc"
+                                frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-layer-group mr-2"></i> Secondary Section
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heading2" class="form-label">Secondary Heading</label>
+                                <input class="form-control" type="text" value="{{ page.heading2 }}"
+                                    placeholder="Enter secondary heading" id="heading2" name="heading2" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="description2" class="form-label">Secondary Description</label>
+                                <input class="form-control" type="text" value="{{ page.description2 }}"
+                                    placeholder="Enter secondary description" id="description2" name="description2"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Organization Items -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-th-large mr-2"></i> Organization Items
+                </div>
+                <div class="card-body">
+                    {% for item in page.org_item %}
+                    <div class="item-group">
+                        <h5 class="item-group-title">{{ item.title }}</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="org_title.{{ forloop.counter }}" class="form-label">Title</label>
+                                    <input class="form-control" type="text" placeholder="Enter title"
+                                        value="{{ item.title }}" id="org_title.{{ forloop.counter }}"
+                                        name="org_title.{{ forloop.counter }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="org_title.{{ forloop.counter }}.image" class="form-label">Image</label>
+
+                                    <!-- Current Image Preview -->
+                                    <div class="current-image-preview">
+                                        <img src="{{ request.scheme }}://{{ request.get_host }}{{ item.image.path }}"
+                                            alt="{{ item.title }}">
+                                        <div class="image-label">Current Image</div>
+                                    </div>
+
+                                    <div class="file-upload-wrapper">
+                                        <input class="file-upload-input" type="file"
+                                            id="org_title.{{ forloop.counter }}.image"
+                                            name="org_title.{{ forloop.counter }}.image" accept="image/*">
+                                        <label class="file-upload-label" for="org_title.{{ forloop.counter }}.image">
+                                            <span>Choose new image...</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Discover Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-compass mr-2"></i> Discover Section
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heading3" class="form-label">Discover Heading 1</label>
+                                <input class="form-control" type="text" placeholder="Enter discover heading"
+                                    value="{{ page.heading3 }}" id="heading3" name="heading3" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heading4" class="form-label">Discover Heading 2</label>
+                                <input class="form-control" type="text" placeholder="Enter discover heading"
+                                    value="{{ page.heading4 }}" id="heading4" name="heading4" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description3" class="form-label">Discover Description</label>
+                        <input class="form-control" type="text" placeholder="Enter discover description"
+                            value="{{ page.description3 }}" id="description3" name="description3" required>
+                    </div>
+
+                    <div class="section-divider"></div>
+                    <h5 class="mb-4">Discover Items</h5>
+
+                    {% for item in page.discover_item %}
+                    <div class="item-group">
+                        <h5 class="item-group-title">{{ item.title }}</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="discover.{{ forloop.counter }}" class="form-label">Title</label>
+                                    <input class="form-control" type="text" placeholder="Enter title"
+                                        value="{{ item.title }}" id="discover.{{ forloop.counter }}"
+                                        name="discover.{{ forloop.counter }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="discover.{{ forloop.counter }}.image" class="form-label">Image</label>
+
+                                    <!-- Current Image Preview -->
+                                    <div class="current-image-preview">
+                                        <img src="{{ request.scheme }}://{{ request.get_host }}{{ item.image.path }}"
+                                            alt="{{ item.title }}">
+                                        <div class="image-label">Current Image</div>
+                                    </div>
+
+                                    <div class="file-upload-wrapper">
+                                        <input class="file-upload-input" type="file"
+                                            id="discover.{{ forloop.counter }}.image"
+                                            name="discover.{{ forloop.counter }}.image" accept="image/*">
+                                        <label class="file-upload-label" for="discover.{{ forloop.counter }}.image">
+                                            <span>Choose new image...</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Footer Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bookmark mr-2"></i> Footer Section
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heading5" class="form-label">End Heading 1</label>
+                                <input class="form-control" type="text" placeholder="Enter footer heading"
+                                    value="{{ page.heading5 }}" id="heading5" name="heading5" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heading6" class="form-label">End Heading 2</label>
+                                <input class="form-control" type="text" placeholder="Enter footer heading"
+                                    value="{{ page.heading6 }}" id="heading6" name="heading6" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heading7" class="form-label">End Heading 3</label>
+                                <input class="form-control" type="text" placeholder="Enter footer heading"
+                                    value="{{ page.heading7 }}" id="heading7" name="heading7" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heading8" class="form-label">End Heading 4</label>
+                                <input class="form-control" type="text" placeholder="Enter footer heading"
+                                    value="{{ page.heading8 }}" id="heading8" name="heading8" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description5" class="form-label">End Description</label>
+                        <input class="form-control" type="text" placeholder="Enter footer description"
+                            value="{{ page.description5 }}" id="description5" name="description5" required>
+                    </div>
+
+                    <div class="section-divider"></div>
+                    <h5 class="mb-4">Footer Images</h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="footer_image1" class="form-label">End Image 1</label>
+
+                                <!-- Current Image Preview -->
+                                <div class="current-image-preview">
+                                    <img src="{{ request.scheme }}://{{ request.get_host }}{{ page.footer_image1.path }}"
+                                        alt="Footer Image 1">
+                                    <div class="image-label">Current Image</div>
+                                </div>
+
+                                <div class="file-upload-wrapper">
+                                    <input class="file-upload-input" type="file" id="footer_image1" name="footer_image1"
+                                        accept="image/*">
+                                    <label class="file-upload-label" for="footer_image1">
+                                        <span>Choose new image...</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="footer_image2" class="form-label">End Image 2</label>
+
+                                <!-- Current Image Preview -->
+                                <div class="current-image-preview">
+                                    <img src="{{ request.scheme }}://{{ request.get_host }}{{ page.footer_image2.path }}"
+                                        alt="Footer Image 2">
+                                    <div class="image-label">Current Image</div>
+                                </div>
+
+                                <div class="file-upload-wrapper">
+                                    <input class="file-upload-input" type="file" id="footer_image2" name="footer_image2"
+                                        accept="image/*">
+                                    <label class="file-upload-label" for="footer_image2">
+                                        <span>Choose new image...</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save mr-2"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    // File upload preview for new images
+    document.getElementById('images').addEventListener('change', function (event) {
+        const previewContainer = document.getElementById('previewContainer');
+        previewContainer.innerHTML = "";
+
+        Array.from(event.target.files).forEach(file => {
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.classList.add('img-preview');
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+
+    // Custom file input labels
+    const fileInputs = document.querySelectorAll('.file-upload-input');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function (e) {
+            const fileName = e.target.files.length > 1
+                ? `${e.target.files.length} files selected`
+                : e.target.files[0]?.name || 'Choose file...';
+
+            const label = input.nextElementSibling;
+            const span = label.querySelector('span');
+            span.textContent = fileName;
+        });
+    });
+
+    // Remove image buttons functionality
+    const removeButtons = document.querySelectorAll('.remove-image');
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const imagePreview = this.closest('.current-image-preview');
+            imagePreview.style.opacity = '0.5';
+
+            // Create a hidden input to track removed images
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'remove_image';
+            hiddenInput.value = imagePreview.querySelector('img').src.split('/').pop();
+            document.getElementById('dashboardForm').appendChild(hiddenInput);
+
+            // Visual indicator that image will be removed
+            this.textContent = '✓';
+            this.style.backgroundColor = '#28a745';
+            this.title = 'Image will be removed on save';
+
+            // Add undo button
+            const undoButton = document.createElement('button');
+            undoButton.className = 'btn btn-sm btn-warning';
+            undoButton.style.position = 'absolute';
+            undoButton.style.bottom = '5px';
+            undoButton.style.right = '5px';
+            undoButton.innerHTML = '<i class="fas fa-undo"></i> Undo';
+            undoButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                imagePreview.style.opacity = '1';
+                hiddenInput.remove();
+                this.remove();
+                button.textContent = '×';
+                button.style.backgroundColor = '#e74a3b';
+                button.title = 'Remove Image';
+            });
+            imagePreview.appendChild(undoButton);
+        });
+    });
+
+    // Form submission
+    const dashboardForm = document.getElementById('dashboardForm');
+    dashboardForm.addEventListener('submit', function (event) {
+        // Form submission code here
+        // Remove this if you want the form to actually submit
+        // event.preventDefault();
+        // event.stopPropagation();
+    });
+</script>
+{% endblock custom_js %}

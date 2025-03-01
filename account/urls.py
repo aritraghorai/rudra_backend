@@ -1,6 +1,7 @@
 from django.urls import re_path, include, path
 from account import views
 from rest_framework.routers import DefaultRouter
+
 # from .views import AddressViewSet
 
 # router = DefaultRouter()
@@ -9,12 +10,25 @@ from rest_framework.routers import DefaultRouter
 # app_name = 'accouts'
 
 urlpatterns = [
-    path('register/', views.RegistrationView.as_view(), name='register'),
-    path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', views.LogoutView.as_view(), name='logout'),
-    path('profile/', views.UserProfileDetailsView.as_view(), name='profile'),
-    path('profile-update/', views.UserProfileUpdateView.as_view(), name='profile-update'),
-    path('change-password/', views.ChangePasswordView.as_view(), name='change-password'),
+    path("register/", views.RegistrationView.as_view(), name="register"),
+    path("login/", views.LoginView.as_view(), name="login"),
+    path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("profile/", views.UserProfileDetailsView.as_view(), name="profile"),
+    path(
+        "profile-update/", views.UserProfileUpdateView.as_view(), name="profile-update"
+    ),
+    path(
+        "change-password/", views.ChangePasswordView.as_view(), name="change-password"
+    ),
+    path(
+        "verify-email/<str:uidb64>/<str:token>/",
+        views.VerifyEmailView.as_view(),
+        name="verify_email",
+    ),
+    path(
+        "resend-verification-email/",
+        views.ResendVerificationEmailView.as_view(),
+        name="resend_verification_email",
+    ),
     # path('', include(router.urls)),
 ]
-

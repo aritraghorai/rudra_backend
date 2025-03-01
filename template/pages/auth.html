@@ -1,0 +1,567 @@
+{% extends 'profile/base.html' %}
+{% block title %}Consultation{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+    /* Main Styles */
+    :root {
+        --primary-color: #4e73df;
+        --primary-dark: #3a57c2;
+        --secondary-color: #f8f9fc;
+        --success-color: #1cc88a;
+        --danger-color: #e74a3b;
+        --warning-color: #f6c23e;
+        --dark-color: #5a5c69;
+        --light-color: #f8f9fa;
+        --border-color: #e3e6f0;
+        --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15);
+        --transition: all 0.2s ease-in-out;
+    }
+
+    .content-wrapper {
+        background-color: var(--secondary-color);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    .content-header {
+        margin-bottom: 2rem;
+    }
+
+    .content-header h1 {
+        color: var(--dark-color);
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .breadcrumb-item {
+        font-size: 0.85rem;
+        color: var(--primary-color);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--dark-color);
+    }
+
+    /* Form Styling */
+    .form-container {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        color: var(--dark-color);
+        font-weight: 600;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-label {
+        color: var(--dark-color);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid var(--border-color);
+        border-radius: 0.35rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+
+    .form-control:focus {
+        border-color: #bac8f3;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .form-control-lg {
+        font-size: 1rem;
+    }
+
+    /* File Upload Styling */
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .file-upload-input {
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        height: calc(1.5em + 1.5rem + 2px);
+        margin: 0;
+        opacity: 0;
+    }
+
+    .file-upload-label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 0;
+        display: flex;
+        align-items: center;
+        height: calc(1.5em + 1.5rem + 2px);
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.35rem;
+        background-color: white;
+        color: #6e707e;
+        cursor: pointer;
+    }
+
+    .file-upload-label::after {
+        content: "Browse";
+        display: inline-block;
+        margin-left: auto;
+        padding: 0.4rem 0.85rem;
+        color: white;
+        background-color: var(--primary-color);
+        border-radius: 0.25rem;
+        font-size: 0.8rem;
+        transition: var(--transition);
+    }
+
+    .file-upload-label:hover::after {
+        background-color: var(--primary-dark);
+    }
+
+    /* Preview Styling */
+    .preview-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .preview-container img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 0.35rem;
+        border: 1px solid var(--border-color);
+        padding: 3px;
+        transition: var(--transition);
+    }
+
+    .preview-container img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    /* Current Image Preview */
+    .current-image-preview {
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .current-image-preview img {
+        max-width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 0.35rem;
+        border: 2px solid var(--border-color);
+        padding: 4px;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+    .current-image-preview img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    .current-image-preview .image-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px 8px;
+        font-size: 0.8rem;
+        border-bottom-left-radius: 0.35rem;
+        border-bottom-right-radius: 0.35rem;
+        text-align: center;
+    }
+
+    .current-image-preview .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .current-image-preview .remove-image:hover {
+        background-color: #bd2130;
+    }
+
+    /* Video Preview */
+    .video-preview {
+        margin-top: 15px;
+        border-radius: 0.35rem;
+        overflow: hidden;
+        border: 2px solid var(--border-color);
+    }
+
+    .video-preview-placeholder {
+        height: 200px;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--dark-color);
+        border-radius: 0.35rem;
+        border: 2px solid var(--border-color);
+    }
+
+    .video-preview-placeholder i {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    /* Card Styling */
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background-color: white;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    /* Button Styling */
+    .btn {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.9rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    /* Item Groups */
+    .item-group {
+        background-color: #f8f9fc;
+        border-radius: 0.35rem;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .item-group-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Section Dividers */
+    .section-divider {
+        width: 100%;
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 2rem 0;
+    }
+
+    /* Multi-image Gallery */
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    /* Features for Consultation */
+    .feature-card {
+        background-color: white;
+        border-radius: 0.35rem;
+        box-shadow: var(--shadow);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+        border-top: 4px solid var(--primary-color);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .feature-card .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: rgba(78, 115, 223, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card .feature-icon i {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .feature-card h5 {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--dark-color);
+    }
+
+    .feature-card p {
+        color: #6e707e;
+        margin-bottom: 0;
+    }
+
+    /* Two column image display */
+    .dual-image-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    /* Reason Cards */
+    .reason-card {
+        background-color: white;
+        border-radius: 0.35rem;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+    }
+
+    .reason-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .reason-card .reason-image {
+        height: 180px;
+        overflow: hidden;
+    }
+
+    .reason-card .reason-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+
+    .reason-card:hover .reason-image img {
+        transform: scale(1.05);
+    }
+
+    .reason-card .reason-content {
+        padding: 1.25rem;
+    }
+
+    .reason-card .reason-content h5 {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--dark-color);
+    }
+
+    .reason-card .reason-content p {
+        color: #6e707e;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Text editor for longer descriptions */
+    .textarea-editor {
+        min-height: 150px;
+    }
+
+    /* Video Preview Styling */
+    .current-video-preview {
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .current-video-preview video {
+        max-width: 100%;
+        border-radius: 0.35rem;
+        border: 2px solid var(--border-color);
+        background-color: black;
+        transition: var(--transition);
+    }
+
+    .current-video-preview .video-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px 8px;
+        font-size: 0.8rem;
+        border-bottom-left-radius: 0.35rem;
+        border-bottom-right-radius: 0.35rem;
+        text-align: center;
+    }
+</style>
+{% endblock css %}
+
+{% block body %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <h1>Auth Page</h1>
+                    <p class="text-muted">Manage your auth page content</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <form method="post" enctype="multipart/form-data" id="consultationForm">
+            {% csrf_token %}
+
+            <!-- Header Section -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="bannerVideo" class="form-label">Banner Video</label>
+                            <!-- Current Video Preview -->
+                            <div class="current-video-preview">
+                                <video controls width="100%" height="200">
+                                    <source
+                                        src="{{ request.scheme }}://{{ request.get_host }}{{ page.bannerVideo.path }}"
+                                        type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="video-label"></div>
+                            </div>
+
+                            <div class="file-upload-wrapper">
+                                <input class="file-upload-input" type="file" id="bannerVideo" name="bannerVideo"
+                                    accept="video/*">
+                                <label class="file-upload-label" for="bannerVideo">
+                                    <span>Choose new video...</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save mr-2"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    // File upload preview for images
+    document.querySelectorAll('.file-upload-input').forEach(input => {
+        input.addEventListener('change', function (event) {
+            if (event.target.files.length > 0) {
+                const file = event.target.files[0];
+
+                if (file.type.startsWith("video/")) {
+                    const videoPreview = this.closest('.form-group').querySelector('.current-video-preview video');
+
+                    // Create object URL for video preview
+                    const objectUrl = URL.createObjectURL(file);
+                    videoPreview.src = objectUrl;
+
+                    // Clean up object URL when done
+                    videoPreview.onload = function () {
+                        URL.revokeObjectURL(objectUrl);
+                    };
+                }
+            }
+        });
+    });
+
+    // Custom file input labels
+    const fileInputs = document.querySelectorAll('.file-upload-input');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function (e) {
+            const fileName = e.target.files.length > 0
+                ? e.target.files[0].name
+                : 'Choose file...';
+
+            const label = input.nextElementSibling;
+            const span = label.querySelector('span');
+            span.textContent = fileName;
+        });
+    });
+
+
+
+    // Form submission
+    const consultationForm = document.getElementById('consultationForm');
+    consultationForm.addEventListener('submit', function (event) {
+        // Form submission code here
+        // event.preventDefault();
+        // event.stopPropagation();
+    });
+</script>
+{% endblock custom_js %}

@@ -1,0 +1,800 @@
+{% extends 'profile/base.html' %}
+{% block title %}Consultation{% endblock %}
+{% load static %}
+
+{% block css %}
+<style>
+    /* Main Styles */
+    :root {
+        --primary-color: #4e73df;
+        --primary-dark: #3a57c2;
+        --secondary-color: #f8f9fc;
+        --success-color: #1cc88a;
+        --danger-color: #e74a3b;
+        --warning-color: #f6c23e;
+        --dark-color: #5a5c69;
+        --light-color: #f8f9fa;
+        --border-color: #e3e6f0;
+        --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15);
+        --transition: all 0.2s ease-in-out;
+    }
+
+    .content-wrapper {
+        background-color: var(--secondary-color);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    .content-header {
+        margin-bottom: 2rem;
+    }
+
+    .content-header h1 {
+        color: var(--dark-color);
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .breadcrumb-item {
+        font-size: 0.85rem;
+        color: var(--primary-color);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--dark-color);
+    }
+
+    /* Form Styling */
+    .form-container {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        color: var(--dark-color);
+        font-weight: 600;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-label {
+        color: var(--dark-color);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid var(--border-color);
+        border-radius: 0.35rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+
+    .form-control:focus {
+        border-color: #bac8f3;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .form-control-lg {
+        font-size: 1rem;
+    }
+
+    /* File Upload Styling */
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .file-upload-input {
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        height: calc(1.5em + 1.5rem + 2px);
+        margin: 0;
+        opacity: 0;
+    }
+
+    .file-upload-label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 0;
+        display: flex;
+        align-items: center;
+        height: calc(1.5em + 1.5rem + 2px);
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.35rem;
+        background-color: white;
+        color: #6e707e;
+        cursor: pointer;
+    }
+
+    .file-upload-label::after {
+        content: "Browse";
+        display: inline-block;
+        margin-left: auto;
+        padding: 0.4rem 0.85rem;
+        color: white;
+        background-color: var(--primary-color);
+        border-radius: 0.25rem;
+        font-size: 0.8rem;
+        transition: var(--transition);
+    }
+
+    .file-upload-label:hover::after {
+        background-color: var(--primary-dark);
+    }
+
+    /* Preview Styling */
+    .preview-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .preview-container img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 0.35rem;
+        border: 1px solid var(--border-color);
+        padding: 3px;
+        transition: var(--transition);
+    }
+
+    .preview-container img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    /* Current Image Preview */
+    .current-image-preview {
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .current-image-preview img {
+        max-width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 0.35rem;
+        border: 2px solid var(--border-color);
+        padding: 4px;
+        background-color: white;
+        transition: var(--transition);
+    }
+
+    .current-image-preview img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    .current-image-preview .image-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px 8px;
+        font-size: 0.8rem;
+        border-bottom-left-radius: 0.35rem;
+        border-bottom-right-radius: 0.35rem;
+        text-align: center;
+    }
+
+    .current-image-preview .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .current-image-preview .remove-image:hover {
+        background-color: #bd2130;
+    }
+
+    /* Video Preview */
+    .video-preview {
+        margin-top: 15px;
+        border-radius: 0.35rem;
+        overflow: hidden;
+        border: 2px solid var(--border-color);
+    }
+
+    .video-preview-placeholder {
+        height: 200px;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--dark-color);
+        border-radius: 0.35rem;
+        border: 2px solid var(--border-color);
+    }
+
+    .video-preview-placeholder i {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    /* Card Styling */
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background-color: white;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    /* Button Styling */
+    .btn {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.9rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    /* Item Groups */
+    .item-group {
+        background-color: #f8f9fc;
+        border-radius: 0.35rem;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .item-group-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Section Dividers */
+    .section-divider {
+        width: 100%;
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 2rem 0;
+    }
+
+    /* Multi-image Gallery */
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    /* Features for Consultation */
+    .feature-card {
+        background-color: white;
+        border-radius: 0.35rem;
+        box-shadow: var(--shadow);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+        border-top: 4px solid var(--primary-color);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .feature-card .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: rgba(78, 115, 223, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card .feature-icon i {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .feature-card h5 {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--dark-color);
+    }
+
+    .feature-card p {
+        color: #6e707e;
+        margin-bottom: 0;
+    }
+
+    /* Two column image display */
+    .dual-image-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    /* Reason Cards */
+    .reason-card {
+        background-color: white;
+        border-radius: 0.35rem;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+    }
+
+    .reason-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .reason-card .reason-image {
+        height: 180px;
+        overflow: hidden;
+    }
+
+    .reason-card .reason-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+
+    .reason-card:hover .reason-image img {
+        transform: scale(1.05);
+    }
+
+    .reason-card .reason-content {
+        padding: 1.25rem;
+    }
+
+    .reason-card .reason-content h5 {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--dark-color);
+    }
+
+    .reason-card .reason-content p {
+        color: #6e707e;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Text editor for longer descriptions */
+    .textarea-editor {
+        min-height: 150px;
+    }
+</style>
+{% endblock css %}
+
+{% block body %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <h1>Consultation Page</h1>
+                    <p class="text-muted">Manage your consultation page content</p>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Consultation</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <form method="post" enctype="multipart/form-data" id="consultationForm">
+            {% csrf_token %}
+
+            <!-- Header Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-heading mr-2"></i> Header Section
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="header1" class="form-label">Main Heading</label>
+                                <input class="form-control" value="{{ page.header1 }}" type="text"
+                                    placeholder="Enter main heading" id="header1" name="header1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="description1" class="form-label">Description</label>
+                                <input class="form-control" type="text" value="{{ page.description1 }}"
+                                    placeholder="Enter main description" id="description1" name="description1" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Features Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-list-ul mr-2"></i> Key Features
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="header_quote1" class="form-label">Feature 1</label>
+                                <input class="form-control" type="text" value="{{ page.header_quote1 }}"
+                                    placeholder="Enter feature 1" id="header_quote1" name="header_quote1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="header_quote2" class="form-label">Feature 2</label>
+                                <input class="form-control" type="text" value="{{ page.header_quote2 }}"
+                                    placeholder="Enter feature 2" id="header_quote2" name="header_quote2" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="header_quote3" class="form-label">Feature 3</label>
+                                <input class="form-control" type="text" value="{{ page.header_quote3 }}"
+                                    placeholder="Enter feature 3" id="header_quote3" name="header_quote3" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="header_quote4" class="form-label">Feature 4</label>
+                                <input class="form-control" type="text" value="{{ page.header_quote4 }}"
+                                    placeholder="Enter feature 4" id="header_quote4" name="header_quote4" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Introduction Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle mr-2"></i> Introduction Section
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="header2" class="form-label">Introduction Heading</label>
+                                <input class="form-control" type="text" value="{{ page.header2 }}"
+                                    placeholder="Enter introduction heading" id="header2" name="header2" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="description2" class="form-label">Introduction Description</label>
+                                <textarea class="form-control textarea-editor"
+                                    placeholder="Enter introduction description" id="description2" name="description2"
+                                    required>{{ page.description2 }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-award mr-2"></i> Experience Section
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="header3" class="form-label">Experience Heading</label>
+                                <input class="form-control" type="text" value="{{ page.header3 }}"
+                                    placeholder="Enter experience heading" id="header3" name="header3" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="video_link1" class="form-label">Video Link</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-youtube"></i></span>
+                                    </div>
+                                    <input class="form-control" type="url" value="{{ page.video_link1 }}"
+                                        placeholder="https://www.youtube.com/" id="video_link1" name="video_link1"
+                                        required>
+                                </div>
+
+                                <!-- Video Preview -->
+                                <div class="video-preview mt-3">
+                                    <iframe width="100%" height="250"
+                                        src="https://www.youtube.com/embed/{{ page.video_link1|slice:'32:' }}"
+                                        frameborder="0" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consultation Reasons Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-users mr-2"></i> Who Should Book A Consultation
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="header4" class="form-label">Section Heading</label>
+                        <input class="form-control" type="text" value="{{ page.header4 }}"
+                            placeholder="Enter section heading" id="header4" name="header4" required>
+                    </div>
+
+                    <div class="section-divider"></div>
+                    <h5 class="mb-4">Consultation Reasons</h5>
+
+                    {% for reason in page.consultation_reasons %}
+                    <div class="item-group">
+                        <h5 class="item-group-title">{{ reason.title }}</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="reason.{{ forloop.counter }}.title" class="form-label">Title</label>
+                                    <input class="form-control" type="text" placeholder="Enter title"
+                                        value="{{ reason.title }}" id="reason.{{ forloop.counter }}.title"
+                                        name="reason.{{ forloop.counter }}.title" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="reason.{{ forloop.counter }}.description"
+                                        class="form-label">Description</label>
+                                    <input class="form-control" type="text" placeholder="Enter description"
+                                        value="{{ reason.description }}" id="reason.{{ forloop.counter }}.description"
+                                        name="reason.{{ forloop.counter }}.description" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="reason.{{ forloop.counter }}.image" class="form-label">Image</label>
+
+                                    <!-- Current Image Preview -->
+                                    <div class="current-image-preview">
+                                        <img src="{{ request.scheme }}://{{ request.get_host }}{{ reason.image.path }}"
+                                            alt="{{ reason.title }}">
+                                        <div class="image-label">Current Image</div>
+                                    </div>
+
+                                    <div class="file-upload-wrapper">
+                                        <input class="file-upload-input" type="file"
+                                            id="reason.{{ forloop.counter }}.image"
+                                            name="reason.{{ forloop.counter }}.image" accept="image/*">
+                                        <label class="file-upload-label" for="reason.{{ forloop.counter }}.image">
+                                            <span>Choose new image...</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Perks Section -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-star mr-2"></i> Perks of Consulting an Expert
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="header5" class="form-label">Section Heading</label>
+                        <input class="form-control" type="text" value="{{ page.header5 }}"
+                            placeholder="Enter section heading" id="header5" name="header5" required>
+                    </div>
+
+                    <div class="section-divider"></div>
+                    <h5 class="mb-4">Consultation Perks</h5>
+
+                    {% for perk in page.perks %}
+                    <div class="item-group">
+                        <h5 class="item-group-title">{{ perk.title }}</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="perk.{{ forloop.counter }}.title" class="form-label">Title</label>
+                                    <input class="form-control" type="text" placeholder="Enter title"
+                                        value="{{ perk.title }}" id="perk.{{ forloop.counter }}.title"
+                                        name="perk.{{ forloop.counter }}.title" required>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="perk.{{ forloop.counter }}.description"
+                                        class="form-label">Description</label>
+                                    <textarea class="form-control textarea-editor" placeholder="Enter description"
+                                        id="perk.{{ forloop.counter }}.description"
+                                        name="perk.{{ forloop.counter }}.description"
+                                        required>{{ perk.description }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="perk.{{ forloop.counter }}.image1" class="form-label">Image 1</label>
+
+                                    <!-- Current Image Preview -->
+                                    <div class="current-image-preview">
+                                        <img src="{{ request.scheme }}://{{ request.get_host }}{{ perk.image1.path }}"
+                                            alt="{{ perk.title }} - Image 1">
+                                        <div class="image-label">Current Image 1</div>
+                                    </div>
+
+                                    <div class="file-upload-wrapper">
+                                        <input class="file-upload-input" type="file"
+                                            id="perk.{{ forloop.counter }}.image1"
+                                            name="perk.{{ forloop.counter }}.image1" accept="image/*">
+                                        <label class="file-upload-label" for="perk.{{ forloop.counter }}.image1">
+                                            <span>Choose new image...</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="perk.{{ forloop.counter }}.image2" class="form-label">Image 2</label>
+
+                                    <!-- Current Image Preview -->
+                                    <div class="current-image-preview">
+                                        <img src="{{ request.scheme }}://{{ request.get_host }}{{ perk.image2.path }}"
+                                            alt="{{ perk.title }} - Image 2">
+                                        <div class="image-label">Current Image 2</div>
+                                    </div>
+
+                                    <div class="file-upload-wrapper">
+                                        <input class="file-upload-input" type="file"
+                                            id="perk.{{ forloop.counter }}.image2"
+                                            name="perk.{{ forloop.counter }}.image2" accept="image/*">
+                                        <label class="file-upload-label" for="perk.{{ forloop.counter }}.image2">
+                                            <span>Choose new image...</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save mr-2"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    // File upload preview for images
+    document.querySelectorAll('.file-upload-input').forEach(input => {
+        input.addEventListener('change', function (event) {
+            if (event.target.files.length > 0 && event.target.files[0].type.startsWith("image/")) {
+                const reader = new FileReader();
+                const previewContainer = this.closest('.form-group').querySelector('.current-image-preview img');
+
+                reader.onload = function (e) {
+                    previewContainer.src = e.target.result;
+                };
+
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        });
+    });
+
+    // Custom file input labels
+    const fileInputs = document.querySelectorAll('.file-upload-input');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function (e) {
+            const fileName = e.target.files.length > 0
+                ? e.target.files[0].name
+                : 'Choose file...';
+
+            const label = input.nextElementSibling;
+            const span = label.querySelector('span');
+            span.textContent = fileName;
+        });
+    });
+
+    // Form submission
+    const consultationForm = document.getElementById('consultationForm');
+    consultationForm.addEventListener('submit', function (event) {
+        // Form submission code here
+        // event.preventDefault();
+        // event.stopPropagation();
+    });
+
+    // Update video preview when YouTube link changes
+    document.getElementById('video_link1').addEventListener('change', function (e) {
+        const videoUrl = e.target.value;
+        const videoId = videoUrl.split('v=')[1]?.split('&')[0] || '';
+
+        if (videoId) {
+            const iframe = document.querySelector('.video-preview iframe');
+            iframe.src = `https://www.youtube.com/embed/${videoId}`;
+        }
+    });
+</script>
+{% endblock custom_js %}

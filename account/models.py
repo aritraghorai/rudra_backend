@@ -17,6 +17,7 @@ from django.utils.translation import gettext as _
 
 from utility.model import BaseModel
 
+
 # Create your models here.
 class CustomUserManager(UserManager):
     """
@@ -42,7 +43,6 @@ class CustomUserManager(UserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
-        
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError(_("Superuser must have is_staff=True."))
@@ -50,36 +50,54 @@ class CustomUserManager(UserManager):
             raise ValueError(_("Superuser must have is_superuser=True."))
         return self.create_user(email, password, **extra_fields)
 
+
 def media_directory_path(instance, filename):
-    return 'rudrakha/user'.format(filename)
+    return "rudrakha/user".format(filename)
+
 
 class User(AbstractUser):
     username = None
     email = models.EmailField(max_length=254, unique=True)
     phone = models.CharField(max_length=21, null=True, blank=True)
     birth_day = models.DateField(null=True, blank=True)
-    gender = models.CharField(choices=(('Male', 'Male'), ('Female', 'Female'),
-                              ('Other', 'Other')), max_length=74, null=True, blank=True)
-    accepts_marketing=models.CharField(choices=(('Yes', 'Yes'), ('No', 'No')), max_length=74, default="Yes")
-    profile_pic = models.FileField(upload_to=media_directory_path, max_length=1000,blank=True)
+    gender = models.CharField(
+        choices=(("Male", "Male"), ("Female", "Female"), ("Other", "Other")),
+        max_length=74,
+        null=True,
+        blank=True,
+    )
+    accepts_marketing = models.CharField(
+        choices=(("Yes", "Yes"), ("No", "No")), max_length=74, default="Yes"
+    )
+    profile_pic = models.FileField(
+        upload_to=media_directory_path, max_length=1000, blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
-    objects =CustomUserManager()
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.email
- 
+
     @property
     def full_name(self):
         return self.first_name + " " + self.last_name
 
     def hash(self):
-        return b32encode(("74-%s-base32secret" % self.email).encode('utf-8'))
+        return b32encode(("74-%s-base32secret" % self.email).encode("utf-8"))
 
 
+class OTP(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="otp")
+    otp = models.CharField(max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.otp
 
-
-
+    class Meta:
+        verbose_name = "OTP"
+        verbose_name_plural = "OTPs"
