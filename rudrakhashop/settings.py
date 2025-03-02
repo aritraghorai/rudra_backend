@@ -180,15 +180,15 @@ SERVER_URL = env("SERVER_URL")
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
+EMAIL_HOST = env(var="EMAIL_HOST")
+EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "tmaity020@gmail.com"
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 # EMAIL_HOST_PASSWORD = "sk_d7c6e461d86a8409296809b81cd11da11007b520d2756728"
-EMAIL_HOST_PASSWORD = "mbrq rfab wfxl ingo"
-DEFAULT_FROM_EMAIL = "tmaity020@gmail.com"
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+SITE_NAME = env("SITE_NAME")
 
 # Backend URL (your Django server URL)
 BASE_URL = SERVER_URL
 # Site name for email templates
-SITE_NAME = "Rudraksha Shop"
