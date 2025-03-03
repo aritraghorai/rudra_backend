@@ -24,105 +24,114 @@ def check_video_exists_then_delete(video_id):
         return False
 
 
+dashboard_page_data = {
+    "images": [
+        {
+            "id": 1,
+            "path": "page_images/1.jpg",
+        },
+        {
+            "id": 2,
+            "path": "page_images/2.jpg",
+        },
+    ],
+    "heading1": "Explore Gupta Rudraksha",
+    "description1": "Dive deep with us in our Gupta Rudraksha Journey and our get to know us even more better.",
+    "video_link1": "https://youtu.be/_drMO01Mjtc?si=cKWZvFp3SgaL8ttV",
+    "heading2": "Our Sacred Commitment",
+    "description2": "Certified Excellence in Rudraksha - Nepal's Premier ISO 9001:2015 Accredited Organization",
+    "header9": "Exclusive and Rare Rudraksha Collection at Gupta Rudraksha ®️",
+    "description6": "Discover the exclusive and rare Rudraksha collection only at Gupta Rudraksha. Our lab-certified, high-quality beads channel ancient spiritual energies for peace, prosperity, and personal growth. Each bead is meticulously chosen to ensure authenticity and potency, providing powerful benefits. Experience genuine, transformative spiritual tools to enhance your life&apos;s journey with Gupta Rudraksha.",
+    "image1": {
+        "id": 1,
+        "path": "page_images/1.jpg",
+    },
+    "org_item": [
+        {
+            "title": "Since 1973",
+            "image": {
+                "id": 1,
+                "path": "page_images/1.jpg",
+            },
+        },
+        {
+            "title": "Vedic Energization",
+            "image": {
+                "id": 1,
+                "path": "page_images/1.jpg",
+            },
+        },
+        {
+            "title": "Lab Certification",
+            "image": {
+                "id": 1,
+                "path": "page_images/1.jpg",
+            },
+        },
+        {
+            "title": "ISO 9001:2015 certified",
+            "image": {
+                "id": 1,
+                "path": "page_images/1.jpg",
+            },
+        },
+        {
+            "title": "Secure Payment",
+            "image": {
+                "id": 1,
+                "path": "page_images/1.jpg",
+            },
+        },
+    ],
+    "heading3": "Discover Your Path",
+    "heading4": "Astrology-Guided Personal Growth",
+    "description3": "Unlock your potential with our expert-led consultations and sacred Rudraksha beads.",
+    "discover_item": [
+        {
+            "image": {
+                "id": 1,
+                "path": "page_images/1.jpg",
+            },
+            "title": "Spirituality",
+        },
+        {
+            "image": {
+                "id": 1,
+                "path": "page_images/1.jpg",
+            },
+            "title": "Meditation",
+        },
+        {
+            "image": {
+                "id": 1,
+                "path": "page_images/1.jpg",
+            },
+            "title": "Wellness",
+        },
+    ],
+    "heading5": "Nepal's 1st & only",
+    "heading6": "ISO Certified",
+    "heading7": "Rudraksha Organization",
+    "description5": "Explore the largest collection of authentic Gupta Rudraksha energized as per our vedic process. For nearly 3+ generations Gupta Rudraksha has been the pioneer of Rudraksha and Shaligram and has supported millions of devotees attain spiritual and professional goals.",
+    "heading8": "Gupta Rudraksha - The Only Vendor in the World To 100% Lifetime Money Back Authenticity Guarantee.",
+    "footer_image1": {
+        "id": 1,
+        "path": "page_images/1.jpg",
+    },
+    "footer_image2": {
+        "id": 1,
+        "path": "page_images/1.jpg",
+    },
+}
+
+
 def dashboard_page(request):
     page = Page.objects.filter(page_name="dashboard").first()
 
     if not page:
         page = Page(
             page_name="dashboard",
-            data={
-                "images": [
-                    {
-                        "id": 1,
-                        "path": "page_images/1.jpg",
-                    },
-                    {
-                        "id": 2,
-                        "path": "page_images/2.jpg",
-                    },
-                ],
-                "heading1": "Explore Gupta Rudraksha",
-                "description1": "Dive deep with us in our Gupta Rudraksha Journey and our get to know us even more better.",
-                "video_link1": "https://youtu.be/_drMO01Mjtc?si=cKWZvFp3SgaL8ttV",
-                "heading2": "Our Sacred Commitment",
-                "description2": "Certified Excellence in Rudraksha - Nepal's Premier ISO 9001:2015 Accredited Organization",
-                "org_item": [
-                    {
-                        "title": "Since 1973",
-                        "image": {
-                            "id": 1,
-                            "path": "page_images/1.jpg",
-                        },
-                    },
-                    {
-                        "title": "Vedic Energization",
-                        "image": {
-                            "id": 1,
-                            "path": "page_images/1.jpg",
-                        },
-                    },
-                    {
-                        "title": "Lab Certification",
-                        "image": {
-                            "id": 1,
-                            "path": "page_images/1.jpg",
-                        },
-                    },
-                    {
-                        "title": "ISO 9001:2015 certified",
-                        "image": {
-                            "id": 1,
-                            "path": "page_images/1.jpg",
-                        },
-                    },
-                    {
-                        "title": "Secure Payment",
-                        "image": {
-                            "id": 1,
-                            "path": "page_images/1.jpg",
-                        },
-                    },
-                ],
-                "heading3": "Discover Your Path",
-                "heading4": "Astrology-Guided Personal Growth",
-                "description3": "Unlock your potential with our expert-led consultations and sacred Rudraksha beads.",
-                "discover_item": [
-                    {
-                        "image": {
-                            "id": 1,
-                            "path": "page_images/1.jpg",
-                        },
-                        "title": "Spirituality",
-                    },
-                    {
-                        "image": {
-                            "id": 1,
-                            "path": "page_images/1.jpg",
-                        },
-                        "title": "Meditation",
-                    },
-                    {
-                        "image": {
-                            "id": 1,
-                            "path": "page_images/1.jpg",
-                        },
-                        "title": "Wellness",
-                    },
-                ],
-                "heading5": "Nepal's 1st & only",
-                "heading6": "ISO Certified",
-                "heading7": "Rudraksha Organization",
-                "description5": "Explore the largest collection of authentic Gupta Rudraksha energized as per our vedic process. For nearly 3+ generations Gupta Rudraksha has been the pioneer of Rudraksha and Shaligram and has supported millions of devotees attain spiritual and professional goals.",
-                "heading8": "Gupta Rudraksha - The Only Vendor in the World To 100% Lifetime Money Back Authenticity Guarantee.",
-                "footer_image1": {
-                    "id": 1,
-                    "path": "page_images/1.jpg",
-                },
-                "footer_image2": {
-                    "id": 1,
-                    "path": "page_images/1.jpg",
-                },
-            },
+            data=dashboard_page_data,
         )
         page.save()
     if request.method == "POST":
@@ -161,6 +170,22 @@ def dashboard_page(request):
                 "id": page_image.id,
                 "path": page_image.image.url,
             }
+        if request.FILES.get("image1"):
+            ## key is not exist then create
+            if "image1" not in page.data:
+                page.data["image1"] = {
+                    "id": 1,
+                    "path": "page_images/1.jpg",
+                }
+            check_image_exists_then_delete(page.data["image1"]["id"])
+            page_image = PageImage(page=page, image=request.FILES.get("image1"))
+            page_image.save()
+
+            page.data["image1"] = {
+                "id": page_image.id,
+                "path": page_image.image.url,
+            }
+
         # Update Org Images and title
         for i in range(1, 6):
             image_key = f"org_title.{i}.image"
@@ -193,32 +218,14 @@ def dashboard_page(request):
                 }
             if request.POST.get(title_key):
                 page.data["discover_item"][i - 1]["title"] = request.POST.get(title_key)
-        if request.POST.get("heading1"):
-            page.data["heading1"] = request.POST.get("heading1")
-        if request.POST.get("description1"):
-            page.data["description1"] = request.POST.get("description1")
-        if request.POST.get("video_link1"):
-            page.data["video_link1"] = request.POST.get("video_link1")
-        if request.POST.get("heading2"):
-            page.data["heading2"] = request.POST.get("heading2")
-        if request.POST.get("description2"):
-            page.data["description2"] = request.POST.get("description2")
-        if request.POST.get("heading3"):
-            page.data["heading3"] = request.POST.get("heading3")
-        if request.POST.get("heading4"):
-            page.data["heading4"] = request.POST.get("heading4")
-        if request.POST.get("description3"):
-            page.data["description3"] = request.POST.get("description3")
-        if request.POST.get("heading5"):
-            page.data["heading5"] = request.POST.get("heading5")
-        if request.POST.get("heading6"):
-            page.data["heading6"] = request.POST.get("heading6")
-        if request.POST.get("heading7"):
-            page.data["heading7"] = request.POST.get("heading7")
-        if request.POST.get("description5"):
-            page.data["description5"] = request.POST.get("description5")
-        if request.POST.get("heading8"):
-            page.data["heading8"] = request.POST.get("heading8")
+                ## Check header then update
+        for key, value in dashboard_page_data.items():
+            if key.startswith("header"):
+                page.data[key] = request.POST.get(key)
+        ## check description then update
+        for key, value in dashboard_page_data.items():
+            if key.startswith("description"):
+                page.data[key] = request.POST.get(key)
 
         page.save()
     return render(

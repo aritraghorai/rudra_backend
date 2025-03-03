@@ -459,6 +459,46 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="header9" class="form-label">Image Header</label>
+                                <input class="form-control" type="text" value="{{ page.header9 }}"
+                                    placeholder="Enter secondary heading" id="header9" name="header9" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="description6" class="form-label">Image Description</label>
+                                <input class="form-control" type="text" value="{{ page.description6 }}"
+                                    placeholder="Enter secondary description" id="description6" name="description6"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="footer_image1" class="form-label"> Image 1</label>
+
+                                <!-- Current Image Preview -->
+                                <div class="current-image-preview">
+                                    <img src="{{ request.scheme }}://{{ request.get_host }}{{ page.image1.path }}"
+                                        alt="Footer Image 1">
+                                    <div class="image-label">Current Image</div>
+                                </div>
+
+                                <div class="file-upload-wrapper">
+                                    <input class="file-upload-input" type="file" id="image1" name="image1"
+                                        accept="image/*">
+                                    <label class="file-upload-label" for="image1">
+                                        <span>Choose new image...</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
