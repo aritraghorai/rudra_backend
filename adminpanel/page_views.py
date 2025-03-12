@@ -220,12 +220,15 @@ def dashboard_page(request):
                 page.data["discover_item"][i - 1]["title"] = request.POST.get(title_key)
                 ## Check header then update
         for key, value in dashboard_page_data.items():
-            if key.startswith("header"):
+            if key.startswith("heading"):
                 page.data[key] = request.POST.get(key)
         ## check description then update
         for key, value in dashboard_page_data.items():
             if key.startswith("description"):
                 page.data[key] = request.POST.get(key)
+        ## check video url
+        if request.POST.get("video_link1"):
+            page.data["video_link1"] = request.POST.get("video_link1")
 
         page.save()
     return render(
