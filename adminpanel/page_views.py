@@ -220,7 +220,7 @@ def dashboard_page(request):
                 page.data["discover_item"][i - 1]["title"] = request.POST.get(title_key)
                 ## Check header then update
         for key, value in dashboard_page_data.items():
-            if key.startswith("heading"):
+            if key.startswith("head"):
                 page.data[key] = request.POST.get(key)
         ## check description then update
         for key, value in dashboard_page_data.items():
