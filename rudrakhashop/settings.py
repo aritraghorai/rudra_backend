@@ -27,6 +27,7 @@ ALLOWED_HOSTS = [
     "160.22.109.164",
     "127.0.0.1",
     "admin.guptarudraksha.com",
+    "https://admin.guptarudraksha.com",
 ]
 
 
