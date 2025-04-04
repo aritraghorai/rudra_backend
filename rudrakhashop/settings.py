@@ -31,6 +31,11 @@ ALLOWED_HOSTS = [
 ]
 
 
+CSRF_TRUSTED_ORIGINS = [
+    "admin.guptarudraksha.com",
+    "https://admin.guptarudraksha.com",
+]
+
 # Application definition
 
 INSTALLED_APPS = [
